@@ -1,2 +1,0 @@
-# Telegram----
-Telegram-напоминалка-бот
