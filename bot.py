@@ -6,7 +6,6 @@ import re
 from tkinter.tix import Tree
 from traceback import print_tb
 
-from cupshelpers import Printer
 import telegramcalendar
 from datetime import datetime, timedelta
 from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove
@@ -133,9 +132,9 @@ def notification(context):
 
 
 def start(update, context):
-    # print(update.message)
+
     update.message.reply_text("*\U0001F4CD Reminder Setup *\U0001F4CD\n\nWhat should be the name\nof the appointment?", parse_mode="markdown")
-    # update.message.reply_text(f"test", reply_markup=telegramcalendar.create_clock(), parse_mode="markdown")
+
     return NAME
 
 
@@ -300,8 +299,7 @@ def split_message(update, context):
     message = update.message.text
     err_code = False
     messages = message.split('\n')
-    
-    if len(messages) != 4 or messages[0].upper() != 'CREATE':
+    if len(messages) != 4 or messages[0].upper() != "/START":
         err_code = True
         message = "Error Incorect input"
         return err_code, message
@@ -314,6 +312,7 @@ def split_message(update, context):
 
     err_code, remainder_time = get_time(messages[3])
     if err_code:
+        print("2")
         return err_code, "Error Incorect input"
 
 
@@ -340,22 +339,11 @@ def main():
 
     dp = updater.dispatcher
 
-    echo_handler = MessageHandler(Filters.text & (~Filters.command), echo)
+
+    conv_handler = CommandHandler("start", echo);
 
     all_reminder_handler = CommandHandler("list", all_reminder)
 
-    conv_handler = ConversationHandler(
-        entry_points=[CommandHandler('start', start)],
-        states={
-            NAME: [MessageHandler(Filters.text, name)],
-            DATE_Q: [CallbackQueryHandler(inline_handler)],
-            TIME_Q: [CallbackQueryHandler(inline_handler2)],
-            INFO: [MessageHandler(Filters.text, info)],
-            OPT: [MessageHandler(Filters.text, opt_info)],
-        },
-        fallbacks=[CommandHandler('cancel', cancel)],
-    )
-    # dp.add_handler(CommandHandler("create", create_new_remainder))
     conv_handler_utc = ConversationHandler(
         entry_points=[CommandHandler("time", utc_time)],
         states={
@@ -364,7 +352,6 @@ def main():
         fallbacks=[CommandHandler('cancel', cancel)]
     )
 
-    dp.add_handler(echo_handler)
 
     dp.add_handler(all_reminder_handler)
 
