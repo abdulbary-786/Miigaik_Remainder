@@ -250,13 +250,8 @@ def cancel(update, context):
                               '\n\nYou canceled the reminder!', reply_markup=ReplyKeyboardRemove(), parse_mode="markdown")
     return ConversationHandler.END
 
-def create_new_reaminder():
-    update.message.reply_text("""Available Commands :-
-    /youtube - To get the youtube URL
-    /linkedin - To get the LinkedIn profile URL
-    /gmail - To get gmail URL
-    /geeks - To get the GeeksforGeeks URL
-    /create - To get the GeeksforGeeks URL""")
+def print_help_messager(update, context):
+    update.message.reply_text("""Available Commands :-\n/start \n reaminder name \n date \n Time\n/list\n/time""")
 
 
 def get_date(message):
@@ -299,6 +294,9 @@ def split_message(update, context):
     message = update.message.text
     err_code = False
     messages = message.split('\n')
+    print(messages)
+    for i in range(len(messages)):
+        messages[i] = messages[i].replace(" ", "")
     if len(messages) != 4 or messages[0].upper() != "/START":
         err_code = True
         message = "Error Incorect input"
@@ -341,6 +339,7 @@ def main():
 
 
     conv_handler = CommandHandler("start", echo);
+    help_handler = CommandHandler("help", print_help_messager);
 
     all_reminder_handler = CommandHandler("list", all_reminder)
 
@@ -352,7 +351,7 @@ def main():
         fallbacks=[CommandHandler('cancel', cancel)]
     )
 
-
+    dp.add_handler(help_handler)
     dp.add_handler(all_reminder_handler)
 
     dp.add_handler(conv_handler)
